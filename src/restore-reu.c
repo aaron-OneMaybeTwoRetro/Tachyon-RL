@@ -34,29 +34,37 @@
 
 bool restore_reu(void) {
     static unsigned long address;
+    static unsigned long block_start = 0;
+    unsigned int reu_block = 0;
+    unsigned int nblocks = (ramlink_size + reu_size - 1)/reu_size;
     
-    printf("Loading REU.\n");
+    printf("Loading REU:  0 of %2u\n", nblocks);
+    printf("Copying REU to RAMLink:    0 of %4u", (unsigned int)(ramlink_size >> 16));
     
+    while(reu_block < nblocks){
+        gotoxy(0, wherey() - 1);
 #if ENABLE_DOS
-    if (ultimate_dos_load_reu(1, 0, ramlink_size) != NULL) {
+    if (ultimate_dos_load_reu(1, 0, reu_size) != NULL) {
         printf("Can't load REU: %s\n", ultimate_ci_status);
         return false;
     }
 #endif
-    
-    printf("Copying REU to RAMLink:   0 of %3u", (unsigned int)(ramlink_size >> 16));
-    for (address = 0; address < ramlink_size; address += BUFFER_SIZE) {
-        gotox(0);
-        printf("Copying REU to RAMLink: %3u", (unsigned int)(address>>16));
+        printf("Loading REU: %2u\n", reu_block + 1);
+        for (address = block_start; address < block_start + reu_size && address < ramlink_size; address += BUFFER_SIZE) {
+            gotox(0);
+            printf("Copying REU to RAMLink: %4u", (unsigned int)(address>>16));
 #if ENABLE_REU
-        reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_REU_TO_C64);
+        reu_copy(address - block_start, buffer, BUFFER_SIZE, REU_COMMAND_REU_TO_C64);
 #endif
 #if ENABLE_RAMLINK
         ramlink_reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_C64_TO_REU);
 #endif
+        }
+        ++reu_block;
+        block_start += reu_size;
     }
     gotox(0);
-    printf("Copying REU to RAMLink: %3u\n", (unsigned int)(address>>16));
+    printf("Copying REU to RAMLink: %4u\n", (unsigned int)(address>>16));
     
     return true;
 }

@@ -35,10 +35,10 @@
 bool restore_dos(void) {
     static unsigned long address;
     
-    printf("Loading RAMLink from disk:   0 of %3u", (unsigned int)(ramlink_size >> 16));
+    printf("Loading RAMLink from disk:    0 of %4u", (unsigned int)(ramlink_size >> 16));
     for (address = 0; address < ramlink_size; address += BUFFER_SIZE) {
         gotox(0);
-        printf("Loading RAMLink from disk: %3u\n", (unsigned int)(address>>16));
+        printf("Loading RAMLink from disk: %4u", (unsigned int)(address>>16));
 #if ENABLE_DOS
         if (ultimate_dos_read_data(1, buffer, BUFFER_SIZE) != BUFFER_SIZE) {
             printf("Read error: %s\n", ultimate_ci_status);
@@ -51,7 +51,7 @@ bool restore_dos(void) {
     }
     
     gotox(0);
-    printf("Loading RAMLink from disk: %3u\n", (unsigned int)(address>>16));
+    printf("Loading RAMLink from disk: %4u\n", (unsigned int)(address>>16));
     
     return true;
 }
