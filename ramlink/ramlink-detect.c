@@ -28,10 +28,21 @@
 */
 
 #include "ramlink.h"
+#include "../drive/drive.h"
+#include <string.h>
+
+static unsigned char ramxlrom[] = "cmd rl dos v2.10";
 
 bool ramlink_detect(void) {
 	if (*(unsigned char *)0xe0a9 == 0x78) {
 		return true;
 	}
 	return false;
+}
+
+bool ramlink_xl_detect(uint8_t device_id) {
+    if (strcmp(ramxlrom, drive_identify(device_id)) == 0) {
+        return true;
+    }
+    return false;
 }

@@ -95,8 +95,12 @@ bool detect(void) {
     }
     else {
         textcolor(COLOR_LIGHTGREEN);
-        printf("Drive %u, ", ramlink_device);
-        
+        if(ramlink_xl_detect(ramlink_device)){
+            printf("XL, Drive %u, ", ramlink_device);
+        }
+        else {
+            printf("Drive %u, ", ramlink_device);
+        }
         if ((ramlink_size = ramlink_get_size(ramlink_device)) == 0) {
             textcolor(COLOR_LIGHTRED);
             printf("missing system partition\n");
