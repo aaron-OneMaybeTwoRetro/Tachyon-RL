@@ -33,8 +33,8 @@
 #include <stdio.h>
 
 bool restore_reu(void) {
-    static unsigned long address;
-    static unsigned long block_start = 0;
+    unsigned long address = 0;
+    unsigned long block_start = 0;
     unsigned int reu_block = 0;
     unsigned int nblocks = (ramlink_size + reu_size - 1)/reu_size;
     
