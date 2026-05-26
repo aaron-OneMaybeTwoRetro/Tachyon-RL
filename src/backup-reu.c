@@ -33,30 +33,37 @@
 #include <stdio.h>
 
 bool backup_reu(void) {
-    static unsigned long address;
+    unsigned long address = 0;
+    unsigned long block_start = 0;
+    unsigned int reu_block = 0;
+    unsigned int nblocks = (ramlink_size + reu_size - 1)/reu_size;
     
-    printf("Copying RAMLink to REU:   0 of %3u", (unsigned int)(ramlink_size >> 16));
-    for (address = 0; address < ramlink_size; address += BUFFER_SIZE) {
-        gotox(0);
-        printf("Copying RAMLink to REU: %3u", (unsigned int)(address>>16));
+    printf("Copying RAMLink to REU:    0 of %4u\n", (unsigned int)(ramlink_size >> 16));
+    printf("Saving REU:  0 of %2u", nblocks);
+    gotoxy(0, wherey() - 1);
+    while(reu_block < nblocks){
+        for (address = block_start; address < block_start + reu_size && address < ramlink_size; address += BUFFER_SIZE) {
+            gotox(0);
+            printf("Copying RAMLink to REU: %4u", (unsigned int)(address>>16));
 #if ENABLE_RAMLINK
-        ramlink_reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_REU_TO_C64);
+            ramlink_reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_REU_TO_C64);
 #endif
 #if ENABLE_REU
-        reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_C64_TO_REU);
+            reu_copy(address - block_start, buffer, BUFFER_SIZE, REU_COMMAND_C64_TO_REU);
 #endif
-    }
-    gotox(0);
-    printf("Copying RAMLink to REU: %3u\n", (unsigned int)(address>>16));
-    
-    printf("Saving REU.\n");
-    
+        }
+        printf("\nSaving REU: %2u", reu_block + 1);
 #if ENABLE_DOS
-    if (ultimate_dos_save_reu(1, 0, ramlink_size) != NULL) {
-        printf("Can't save REU: %s\n", ultimate_ci_status);
-        return false;
-    }
+        if (ultimate_dos_save_reu(1, 0, reu_size) != NULL) {
+            printf("Can't save REU: %s\n", ultimate_ci_status);
+            return false;
+        }
 #endif
-    
+        gotoxy(0, wherey() - 1);
+        ++reu_block;
+        block_start += reu_size;
+    }
+    printf("Copying RAMLink to REU: %4u", (unsigned int)(address>>16));
+    gotoxy(0, wherey() + 2);
     return true;
 }

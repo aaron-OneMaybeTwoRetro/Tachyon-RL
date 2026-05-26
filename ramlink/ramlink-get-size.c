@@ -56,8 +56,15 @@ unsigned long ramlink_get_size(uint8_t device_id) {
 		}
 		++i;
 	}
-
-	size = (((unsigned long)block[22] << 16) | ((unsigned int)block[23] << 8) | block[24]) + 0x1000;
-
+	
+	size = (((unsigned long)block[21] << 24) |
+			((unsigned long)block[22] << 16) | 
+			((unsigned long)block[23] << 8)  | 
+			((unsigned long)block[24]));
+   if( ramlink_xl_detect(device_id)) {
+        size = size + 0x10000; // RAMLINK XL
+	} else {
+		size = size + 0x1000;  // RAMLINK
+	}
 	return size;
 }
