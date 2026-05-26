@@ -32,37 +32,47 @@
 #include <conio.h>
 #include <stdio.h>
 
+#include <c64.h>
+#include <accelerator.h>
+
 bool restore_reu(void) {
     unsigned long address = 0;
     unsigned long block_start = 0;
     unsigned int reu_block = 0;
     unsigned int nblocks = (ramlink_size + reu_size - 1)/reu_size;
-    
+    if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
     printf("Loading REU:  0 of %2u\n", nblocks);
     printf("Copying REU to RAMLink:    0 of %4u", (unsigned int)(ramlink_size >> 16));
     
     while(reu_block < nblocks){
         gotoxy(0, wherey() - 1);
-#if ENABLE_DOS
-    if (ultimate_dos_load_reu(1, 0, reu_size) != NULL) {
-        printf("Can't load REU: %s\n", ultimate_ci_status);
-        return false;
-    }
-#endif
+        #if ENABLE_DOS
+            if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
+            if (ultimate_dos_load_reu(1, 0, reu_size) != NULL) {
+                if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
+                printf("Can't load REU: %s\n", ultimate_ci_status);
+                return false;
+            }
+        #endif
         printf("Loading REU: %2u\n", reu_block + 1);
         for (address = block_start; address < block_start + reu_size && address < ramlink_size; address += BUFFER_SIZE) {
             gotox(0);
             printf("Copying REU to RAMLink: %4u", (unsigned int)(address>>16));
-#if ENABLE_REU
-        reu_copy(address - block_start, buffer, BUFFER_SIZE, REU_COMMAND_REU_TO_C64);
-#endif
-#if ENABLE_RAMLINK
-        ramlink_reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_C64_TO_REU);
-#endif
+        #if ENABLE_REU
+            if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
+            reu_copy(address - block_start, buffer, BUFFER_SIZE, REU_COMMAND_REU_TO_C64);
+            if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
+        #endif
+        #if ENABLE_RAMLINK
+            if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
+            ramlink_reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_C64_TO_REU);
+            if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
+        #endif
         }
         ++reu_block;
         block_start += reu_size;
     }
+    if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
     gotox(0);
     printf("Copying REU to RAMLink: %4u\n", (unsigned int)(address>>16));
     

@@ -30,6 +30,7 @@
 #include "tachyon.h"
 
 #include <stdio.h>
+#include <accelerator.h>
 
 void detect_cpu(void) {
     if (((*(uint8_t *)0xd0bc) & 0x80) == 0) {
@@ -47,12 +48,10 @@ void detect_cpu(void) {
             cpu_speed = 20;
         }
     }
-#if 0
-    else if (*(uint8_t *)0xd030 == 0xfc) {
+    else if (detect_c128() == 1){
         cpu = CPU_C128;
         cpu_speed = 2;
     }
-#endif
     else {
         cpu = CPU_C64;
         cpu_speed = 1;

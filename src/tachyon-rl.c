@@ -121,6 +121,21 @@ int main(void) {
             break;
         }
         
+        if (cpu == CPU_C128){
+            printf("Use C128 2mhz partial accel (Y/N)\n");
+            do {
+            ret = tolower(cgetc());
+                } while (ret != 'y' && ret != 'n');
+                printf("Running full time at: ");  
+            textcolor(COLOR_LIGHTGREEN);
+            if (ret == 'n') {
+                cpu_speed = 1;
+                printf("1mhz\n");}
+            else {cpu_speed = 2;
+                printf("2mhz\n");}
+            textcolor(COLOR_GRAY3);
+        }
+        
         if (cpu_speed == 20) {
             if (cpu == CPU_SUPERCPU_V1) {
                 speed_index = 2;

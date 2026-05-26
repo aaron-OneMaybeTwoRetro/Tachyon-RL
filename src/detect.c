@@ -123,7 +123,7 @@ bool detect(void) {
         break;
         
     case CPU_C128:
-        printf("C128");
+        printf("C128 (64 mode)");
         break;
         
     case CPU_SUPERCPU_V1:
