@@ -32,19 +32,31 @@
 #include <conio.h>
 #include <stdio.h>
 
-#include <c64.h>
 #include <accelerator.h>
+#include "timer.h"
 
 bool backup_dos(void) {
     static unsigned long address;
     unsigned int iPrint = 0;
     if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
     printf("Saving RAMLink to disk:    0 of %4u", (unsigned int)(ramlink_size >> 16));
+    printf("\nDur: 00:00:00:0");
+    gotox(21);
+    printf("ETC: ");
+    timer_output();
+    gotoxy(0, wherey() - 1);
     for (address = 0; address < ramlink_size; address += BUFFER_SIZE) {
         if ((iPrint==3)){
             iPrint=0;
             gotox(0);
-            printf("Saving RAMLink to disk: %4u", (unsigned int)(address>>16));}
+            printf("Saving RAMLink to disk: %4u", (unsigned int)(address>>16));
+            printf("\nDur: ");
+            timer_output();
+            gotox(21);
+            printf("ETC: ");
+            timer_print_hrsminsec((timer_seconds() / (address>>16)) * ramlink_size>>16);
+            gotoxy(0,wherey()-1);
+        }
         else {iPrint++;}
             #if ENABLE_RAMLINK
                 if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
@@ -62,6 +74,6 @@ bool backup_dos(void) {
     if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
     gotox(0);
     printf("Saving RAMLink to disk: %4u\n", (unsigned int)(address>>16));
-        
+
     return true;
 }
