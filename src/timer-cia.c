@@ -30,7 +30,7 @@
 #include "timer.h"
 
 #include <cbm.h>
-
+#include <peekpoke.h>
 #include <stdio.h>
 
 static void output_bcd(unsigned char value);
@@ -39,9 +39,9 @@ static void output_bcd_single(unsigned char value);
 void timer_start(void) {
 	unsigned char x;
 	CIA1.tod_hour = 0;
-	CIA1.tod_10 = 0;
 	CIA1.tod_min = 0;
 	CIA1.tod_sec = 0;
+	CIA1.tod_10 = 0;
 	x = CIA1.tod_10;
 }
 
@@ -69,3 +69,33 @@ static void output_bcd(unsigned char value) {
 static void output_bcd_single(unsigned char value) {
 	putchar((value & 0xf) | 0x30);
 }
+
+//additions for OMTR timers
+
+unsigned char bcd_to_int(unsigned char bcd) {
+    return (bcd >> 4) * 10 + (bcd & 0x0F);
+}
+
+int timer_seconds(void) {
+   unsigned char tenths, seconds, minutes, hours;
+   unsigned long total_seconds;
+
+   tenths=CIA1.tod_10;
+   seconds=bcd_to_int(CIA1.tod_sec);
+   minutes=bcd_to_int(CIA1.tod_min);
+   hours=bcd_to_int(CIA1.tod_hour & 0x7F);
+   total_seconds = (unsigned long)hours * 3600 + 
+                   (unsigned long)minutes * 60 + 
+                   (unsigned long)seconds;
+   return total_seconds;
+}
+
+void timer_print_hrsminsec(unsigned long total_seconds) {
+   int hours = total_seconds / 3600;
+   int minutes = (total_seconds % 3600) / 60;
+   int seconds = total_seconds % 60;
+   char time_text[9];
+   sprintf(time_text, "%02d:%02d:%02d", hours, minutes, seconds);
+   printf(time_text);
+   printf(":0");
+} 

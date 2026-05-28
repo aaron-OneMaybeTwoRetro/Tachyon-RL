@@ -43,8 +43,12 @@ bool backup_reu(void) {
     unsigned int iPrint = 0;
     
     printf("Copying RAMLink to REU:    0 of %4u\n", (unsigned int)(ramlink_size >> 16));
-    printf("Saving REU:  0 of %2u", nblocks);
-    gotoxy(0, wherey() - 1);
+    printf("Saving REU:   0 of %3u", nblocks);
+    printf("\nDur: 00:00:00:0");
+        gotox(21);
+        printf("ETC: ");
+        timer_output();
+    gotoxy(0, wherey() - 2);
     while(reu_block < nblocks){
         for (address = block_start; address < block_start + reu_size && address < ramlink_size; address += BUFFER_SIZE) {
             if ((iPrint==3)){
@@ -63,17 +67,23 @@ bool backup_reu(void) {
             if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
         #endif
         }
-        printf("\nSaving REU: %2u", reu_block + 1);
-        printf(" - ");
+        gotox(0);
+        printf("\nSaving REU: %3u", reu_block + 1);
+        printf("\nDur: ");
         timer_output();
-#if ENABLE_DOS
-        if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
-        if (ultimate_dos_save_reu(1, 0, reu_size) != NULL) {
-            if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
-            printf("Can't save REU: %s\n", ultimate_ci_status);
-            return false;
-        }
-#endif
+        gotox(21);
+        printf("ETC: ");
+        timer_print_hrsminsec((timer_seconds() / (reu_block + 1)) * nblocks);
+        gotoxy(0,wherey()-1);
+
+        #if ENABLE_DOS
+            if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(1);}
+            if (ultimate_dos_save_reu(1, 0, reu_size) != NULL) {
+                if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
+                printf("Can't save REU: %s\n", ultimate_ci_status);
+                return false;
+            }
+        #endif
         gotoxy(0, wherey() - 1);
         ++reu_block;
         block_start += reu_size;

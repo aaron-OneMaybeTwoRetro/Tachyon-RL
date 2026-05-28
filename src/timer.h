@@ -33,5 +33,7 @@
 void timer_start(void);
 void timer_stop(void);
 void timer_output(void);
+void timer_print_hrsminsec(unsigned long total_seconds);
+int timer_seconds(void);
 
 #endif /* HAD_TIMER_H */

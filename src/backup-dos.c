@@ -45,7 +45,7 @@ bool backup_dos(void) {
             iPrint=0;
             gotox(0);
             printf("Saving RAMLink to disk: %4u", (unsigned int)(address>>16));}
-        else {iPrint++};
+        else {iPrint++;}
             #if ENABLE_RAMLINK
                 if(cpu == CPU_C128 && cpu_speed != 1) {set_c128_speed(0);}
                 ramlink_reu_copy(address, buffer, BUFFER_SIZE, REU_COMMAND_REU_TO_C64);

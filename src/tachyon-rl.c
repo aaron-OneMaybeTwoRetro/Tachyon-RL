@@ -126,12 +126,15 @@ int main(void) {
             do {
             ret = tolower(cgetc());
                 } while (ret != 'y' && ret != 'n');
-                printf("Running full time at: ");  
-            textcolor(COLOR_LIGHTGREEN);
+                printf("Running ");  
             if (ret == 'n') {
                 cpu_speed = 1;
+                printf(" full time at ");
+                textcolor(COLOR_LIGHTGREEN);
                 printf("1mhz\n");}
             else {cpu_speed = 2;
+                printf(" partially accel at ");
+                textcolor(COLOR_LIGHTGREEN);
                 printf("2mhz\n");}
             textcolor(COLOR_GRAY3);
         }
@@ -164,8 +167,8 @@ int main(void) {
             continue;
         }
         
-        clear_lines(top_line + 3, 25);
-        gotoxy(0, top_line + 3);
+        clear_lines(top_line + 5, 25);
+        gotoxy(0, top_line + 5);
 
         if (ret == 'b') {
             printf("Backing up RAMLink.\n");
